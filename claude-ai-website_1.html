@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude AI — Intelligent Infrastructure for the Modern Enterprise</title>
+<meta name="description" content="Claude is the enterprise-grade AI assistant built on trust, performance, and seamless integration. Deploy with confidence. Scale without limits.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0C0C0F;--ink2:#141418;--ink3:#1C1C22;--ink4:#252530;
+  --cream:#F5F0E8;--cream-dim:#B8B0A0;--cream-faint:#6B6560;
+  --copper:#C8854A;--clt:#E8A870;--cdk:#3D2A1A;
+  --teal:#3DBFA0;
+  --b:rgba(245,240,232,0.07);--bm:rgba(245,240,232,0.14);
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--ink);color:var(--cream);line-height:1.6;overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+#cur{position:fixed;width:8px;height:8px;background:var(--copper);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s}
+#cur-r{position:fixed;width:38px;height:38px;border:1px solid rgba(200,133,74,.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .08s,top .08s,width .3s,height .3s,opacity .3s}
+body:has(a:hover) #cur,body:has(button:hover) #cur{width:16px;height:16px;background:var(--clt)}
+body:has(a:hover) #cur-r,body:has(button:hover) #cur-r{width:60px;height:60px;opacity:.4}
+
+/* PROGRESS */
+#prog{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--copper),var(--teal));z-index:300;width:0%;transition:width .12s linear}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--ink);z-index:500;display:flex;align-items:center;justify-content:center;transition:opacity .7s .2s,visibility .7s .2s}
+#loader.done{opacity:0;visibility:hidden}
+.ld-logo{font-family:var(--serif);font-size:2.5rem;color:var(--cream);letter-spacing:-.03em;opacity:0;animation:lf .6s ease .4s forwards}
+.ld-bar{width:160px;height:1px;background:var(--b);margin:.75rem auto 0;overflow:hidden}
+.ld-fill{height:100%;background:linear-gradient(90deg,var(--copper),var(--teal));width:0%;animation:lb .8s ease .6s forwards}
+@keyframes lf{to{opacity:1}}
+@keyframes lb{to{width:100%}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:1.3rem 4rem;background:rgba(12,12,15,.8);backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--b);transition:padding .4s var(--ease),background .4s}
+nav.scrolled{padding:.85rem 4rem;background:rgba(12,12,15,.97)}
+.nav-logo{font-family:var(--serif);font-size:1.4rem;color:var(--cream);text-decoration:none;letter-spacing:-.02em}
+.nav-logo span{color:var(--copper)}
+.nav-links{display:flex;gap:2.5rem;list-style:none;align-items:center}
+.nav-links a{font-size:.8rem;font-weight:400;color:var(--cream-dim);text-decoration:none;letter-spacing:.05em;text-transform:uppercase;transition:color .2s;position:relative;padding-bottom:2px}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--copper);transform:scaleX(0);transform-origin:right;transition:transform .35s var(--ease)}
+.nav-links a:hover{color:var(--cream)}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+.nav-cta{font-size:.78rem!important;font-weight:500!important;color:var(--ink)!important;background:var(--copper)!important;padding:.55rem 1.4rem!important;border-radius:2px!important;transition:background .25s!important;white-space:nowrap}
+.nav-cta::after{display:none!important}
+.nav-cta:hover{background:var(--clt)!important;color:var(--ink)!important}
+.hbg{display:none;cursor:pointer;flex-direction:column;gap:5px;z-index:201}
+.hbg span{display:block;width:22px;height:1.5px;background:var(--cream);transition:all .35s var(--ease)}
+.hbg.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.hbg.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hbg.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+/* HERO */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:7rem 4rem 4rem;position:relative;overflow:hidden;gap:5rem}
+#hero-canvas{position:absolute;inset:0;pointer-events:none;opacity:.55}
+.hero-grid-bg{position:absolute;inset:0;background-image:linear-gradient(var(--b) 1px,transparent 1px),linear-gradient(90deg,var(--b) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 100% 100% at 50% 50%,black 20%,transparent 80%)}
+.hero-glow{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(200,133,74,.12) 0%,transparent 65%);top:-200px;right:-100px;animation:drift 9s ease-in-out infinite;pointer-events:none}
+.hero-glow2{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(61,191,160,.08) 0%,transparent 65%);bottom:0;left:-50px;animation:drift 13s ease-in-out infinite reverse;pointer-events:none}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(-30px,25px) scale(1.05)}70%{transform:translate(20px,-20px) scale(.95)}}
+.hero-left{position:relative;z-index:2}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:.68rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--clt);border:1px solid var(--cdk);padding:.35rem .9rem;margin-bottom:1.75rem;background:rgba(200,133,74,.05)}
+.hero-bdot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+.hero h1{font-family:var(--serif);font-size:clamp(2.6rem,5vw,4.8rem);line-height:1.06;letter-spacing:-.03em;color:var(--cream);margin-bottom:1.5rem}
+.hero h1 em{font-style:italic;color:var(--clt)}
+.typing-cursor{display:inline-block;width:2px;height:.85em;background:var(--copper);margin-left:3px;vertical-align:middle;animation:blink .9s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.hero-sub{font-size:.98rem;color:var(--cream-dim);max-width:480px;line-height:1.78;margin-bottom:2.5rem;font-weight:300}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:3rem}
+.hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap;border-top:1px solid var(--b);padding-top:2rem}
+.stat-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--cream-faint);margin-bottom:.25rem}
+.stat-val{font-family:var(--serif);font-size:1.9rem;color:var(--cream);letter-spacing:-.02em}
+.hero-right{position:relative;z-index:2;height:560px}
+.himg{position:absolute;overflow:hidden;border:1px solid var(--bm)}
+.himg img{width:100%;height:100%;object-fit:cover;filter:saturate(.5) brightness(.5);transition:filter .6s var(--ease),transform .7s var(--ease);display:block}
+.himg:hover img{filter:saturate(.8) brightness(.68);transform:scale(1.05)}
+.himg-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(12,12,15,.7) 0%,transparent 55%)}
+.himg-scan{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--copper),transparent);animation:scan 5s linear infinite}
+@keyframes scan{0%{top:0;opacity:0}5%{opacity:1}95%{opacity:.8}100%{top:100%;opacity:0}}
+.himg-main{top:0;left:0;right:0;height:350px}
+.himg-bl{bottom:0;left:0;width:47%;height:195px}
+.himg-br{bottom:0;right:0;width:47%;height:195px}
+.himg-label{position:absolute;bottom:.9rem;left:1rem;font-family:var(--mono);font-size:.63rem;color:var(--teal);letter-spacing:.08em;display:flex;align-items:center;gap:6px;z-index:2}
+.himg-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+.himg-num{position:absolute;top:.9rem;right:.9rem;font-family:var(--mono);font-size:.63rem;color:var(--cream-faint);z-index:2}
+
+/* BUTTONS */
+.btn-primary{font-family:var(--sans);font-size:.8rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:var(--copper);border:none;padding:.9rem 2.2rem;cursor:none;text-decoration:none;display:inline-block;position:relative;overflow:hidden;transition:transform .2s var(--ease)}
+.btn-primary::before{content:'';position:absolute;inset:0;background:var(--clt);transform:translateX(-101%);transition:transform .4s var(--ease)}
+.btn-primary:hover::before{transform:translateX(0)}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-primary > span{position:relative;z-index:1}
+.btn-ghost{font-family:var(--sans);font-size:.8rem;font-weight:400;letter-spacing:.06em;text-transform:uppercase;color:var(--cream-dim);background:transparent;border:1px solid var(--bm);padding:.9rem 2.2rem;cursor:none;text-decoration:none;display:inline-block;transition:border-color .25s,color .25s,background .25s}
+.btn-ghost:hover{border-color:var(--cream-dim);color:var(--cream);background:rgba(245,240,232,.04)}
+
+/* LOGO STRIP */
+.logo-strip{background:var(--ink2);border-top:1px solid var(--b);border-bottom:1px solid var(--b);padding:1.4rem 0;overflow:hidden;position:relative}
+.logo-strip::before,.logo-strip::after{content:'';position:absolute;top:0;bottom:0;width:100px;z-index:2;pointer-events:none}
+.logo-strip::before{left:0;background:linear-gradient(90deg,var(--ink2),transparent)}
+.logo-strip::after{right:0;background:linear-gradient(-90deg,var(--ink2),transparent)}
+.logo-track{display:flex;gap:4rem;width:max-content;animation:marquee 28s linear infinite;align-items:center}
+.logo-track:hover{animation-play-state:paused}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.logo-item{font-family:var(--sans);font-size:.78rem;font-weight:500;color:var(--cream-faint);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;transition:color .3s;cursor:default}
+.logo-item:hover{color:var(--cream-dim)}
+
+/* SECTIONS */
+section{padding:6rem 4rem}
+.section-tag{font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:var(--copper);margin-bottom:.9rem;display:flex;align-items:center;gap:.75rem}
+.section-tag::before{content:'';display:block;width:20px;height:1px;background:var(--copper)}
+.section-title{font-family:var(--serif);font-size:clamp(1.9rem,3.5vw,3.3rem);line-height:1.1;letter-spacing:-.02em;color:var(--cream);max-width:640px;margin-bottom:1rem}
+.section-sub{font-size:.93rem;color:var(--cream-dim);max-width:520px;line-height:1.8;font-weight:300}
+
+/* REVEAL ANIMATIONS */
+.fu{opacity:0;transform:translateY(32px);transition:opacity .75s var(--ease),transform .75s var(--ease)}
+.fu.v{opacity:1;transform:translateY(0)}
+.fl{opacity:0;transform:translateX(-36px);transition:opacity .75s var(--ease),transform .75s var(--ease)}
+.fl.v{opacity:1;transform:translateX(0)}
+.fr{opacity:0;transform:translateX(36px);transition:opacity .75s var(--ease),transform .75s var(--ease)}
+.fr.v{opacity:1;transform:translateX(0)}
+.fs{opacity:0;transform:scale(.93);transition:opacity .75s var(--ease),transform .75s var(--ease)}
+.fs.v{opacity:1;transform:scale(1)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+.d4{transition-delay:.4s}.d5{transition-delay:.5s}.d6{transition-delay:.6s}
+
+/* FEATURES GRID */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:4rem;border:1px solid var(--b)}
+.fc{background:var(--ink2);position:relative;overflow:hidden;transition:background .4s;transform-style:preserve-3d}
+.fc::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--copper),transparent);transform:scaleX(0);transform-origin:left;transition:transform .55s var(--ease)}
+.fc:hover{background:var(--ink3)}
+.fc:hover::after{transform:scaleX(1)}
+.fc-img{height:190px;overflow:hidden;position:relative}
+.fc-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.4) brightness(.48);transition:filter .6s var(--ease),transform .7s var(--ease);display:block}
+.fc:hover .fc-img img{filter:saturate(.75) brightness(.65);transform:scale(1.07)}
+.fc-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,var(--ink2) 0%,transparent 60%)}
+.fc-body{padding:1.75rem 2rem 2rem}
+.fc-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.9rem}
+.fc-icon{width:34px;height:34px;border:1px solid var(--bm);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;transition:border-color .3s,background .3s}
+.fc:hover .fc-icon{border-color:var(--cdk);background:rgba(200,133,74,.08)}
+.fc-num{font-family:var(--mono);font-size:.65rem;color:var(--cream-faint);letter-spacing:.1em}
+.fc-title{font-family:var(--serif);font-size:1.15rem;color:var(--cream);margin-bottom:.55rem;letter-spacing:-.01em}
+.fc-desc{font-size:.86rem;color:var(--cream-dim);line-height:1.75;font-weight:300}
+
+/* PARALLAX DIVIDER */
+.par-div{position:relative;height:500px;overflow:hidden}
+.par-img{position:absolute;inset:-20%;width:100%;height:140%;object-fit:cover;filter:saturate(.4) brightness(.3);will-change:transform}
+.par-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:5rem;background:linear-gradient(120deg,rgba(12,12,15,.9) 0%,rgba(12,12,15,.4) 65%,transparent 100%)}
+.par-line{width:40px;height:2px;background:var(--copper);margin-bottom:1.25rem}
+.par-quote{font-family:var(--serif);font-size:clamp(1.4rem,3vw,2.4rem);color:var(--cream);line-height:1.35;max-width:700px;font-style:italic;margin-bottom:1.5rem}
+.par-attr{font-size:.78rem;color:var(--cream-faint);letter-spacing:.07em;text-transform:uppercase}
+.par-attr strong{display:block;color:var(--cream-dim);font-weight:500;text-transform:none;letter-spacing:normal;font-size:.92rem;margin-bottom:.2rem}
+
+/* BENTO */
+.bento-sec{background:var(--ink2)}
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:1px;margin-top:4rem;border:1px solid var(--b)}
+.bc{background:var(--ink);padding:2.5rem;position:relative;overflow:hidden;transition:background .35s}
+.bc:hover{background:var(--ink3)}
+.bc.wide{grid-column:span 2}
+.bc.tall{grid-row:span 2}
+.bc-img{width:100%;display:block;filter:saturate(.5) brightness(.5);transition:filter .55s var(--ease),transform .65s var(--ease);margin-top:1.5rem;height:185px;object-fit:cover}
+.bc:hover .bc-img{filter:saturate(.78) brightness(.68);transform:scale(1.04)}
+.bc-label{font-size:.65rem;font-family:var(--mono);letter-spacing:.12em;color:var(--copper);text-transform:uppercase;margin-bottom:.7rem}
+.bc-title{font-family:var(--serif);font-size:1.3rem;color:var(--cream);line-height:1.3;letter-spacing:-.01em;margin-bottom:.5rem}
+.bc-desc{font-size:.82rem;color:var(--cream-dim);line-height:1.72;font-weight:300}
+.bc-big{font-family:var(--serif);font-size:3.8rem;color:var(--cream);line-height:1;letter-spacing:-.04em;margin-top:1rem}
+.bc-big em{font-size:1.1rem;color:var(--clt);font-family:var(--sans);font-style:normal;font-weight:300;letter-spacing:0}
+.bc-bars{margin-top:1.5rem;display:flex;align-items:flex-end;gap:5px;height:80px}
+.bar{background:var(--cdk);flex:1;border-radius:2px 2px 0 0;height:0%;transition:height .8s var(--ease),background .3s}
+.bar.lit{background:var(--copper)}
+.bc:hover .bar.lit{background:var(--clt)}
+
+/* HOW IT WORKS — row layout */
+.steps-wrap{margin-top:4rem}
+.step-row{display:grid;grid-template-columns:80px 1fr 1fr;align-items:center;gap:3rem;padding:3rem 0;border-bottom:1px solid var(--b);position:relative;overflow:hidden}
+.step-row:first-child{border-top:1px solid var(--b)}
+.step-row::before{content:'';position:absolute;left:0;bottom:0;height:1px;background:linear-gradient(90deg,var(--copper),var(--teal));transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease)}
+.step-row:hover::before{transform:scaleX(1)}
+.step-n{font-family:var(--serif);font-size:4rem;color:rgba(245,240,232,.05);line-height:1;position:relative}
+.step-n::after{content:attr(data-n);position:absolute;inset:0;color:rgba(200,133,74,.2);transition:color .35s var(--ease)}
+.step-row:hover .step-n::after{color:rgba(200,133,74,.5)}
+.step-text h3{font-family:var(--serif);font-size:1.3rem;color:var(--cream);margin-bottom:.6rem;letter-spacing:-.01em}
+.step-text p{font-size:.87rem;color:var(--cream-dim);line-height:1.75;font-weight:300}
+.step-img{height:160px;overflow:hidden;border:1px solid var(--b);position:relative}
+.step-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.4) brightness(.45);transition:filter .6s var(--ease),transform .7s var(--ease);display:block}
+.step-row:hover .step-img img{filter:saturate(.7) brightness(.65);transform:scale(1.06)}
+.step-scan{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent);animation:scan 6s linear infinite}
+
+/* CODE */
+.code-sec{background:var(--ink)}
+.code-wrap{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-top:3rem}
+.code-blk{background:var(--ink3);border:1px solid var(--b);overflow:hidden;position:relative}
+.code-blk::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--copper) 40%,var(--teal) 60%,transparent);animation:shi 4s linear infinite}
+@keyframes shi{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
+.code-hdr{display:flex;align-items:center;gap:8px;padding:1rem 1.5rem;border-bottom:1px solid var(--b);background:var(--ink2)}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot.r{background:#FF5F57}.dot.y{background:#FEBC2E}.dot.g{background:#28C840}
+.ctabs{display:flex;gap:0;margin-left:1rem}
+.ctab{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;color:var(--cream-faint);padding:.25rem .75rem;cursor:pointer;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.ctab.active{color:var(--cream-dim);border-color:var(--copper)}
+.code-body{padding:1.75rem;overflow-x:auto}
+.code-body pre{font-family:var(--mono);font-size:.78rem;line-height:1.9;color:var(--cream-dim)}
+.kw{color:var(--clt)}.str{color:var(--teal)}.cm{color:var(--cream-faint)}.fn{color:#7EB8E8}.num{color:#C5A0E0}.op{color:rgba(245,240,232,.4)}
+.code-side h3{font-family:var(--serif);font-size:1.9rem;color:var(--cream);margin-bottom:1rem;letter-spacing:-.02em;line-height:1.2}
+.code-side p{font-size:.87rem;color:var(--cream-dim);line-height:1.82;margin-bottom:1.25rem;font-weight:300}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem}
+.chip{font-family:var(--mono);font-size:.65rem;color:var(--clt);border:1px solid var(--cdk);padding:.28rem .72rem;background:rgba(200,133,74,.04);letter-spacing:.07em;transition:background .25s,color .25s,border-color .25s;cursor:default}
+.chip:hover{background:rgba(200,133,74,.12);color:var(--cream);border-color:var(--copper)}
+
+/* PRICING */
+.pricing-sec{background:var(--ink2)}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:4rem;border:1px solid var(--b)}
+.pc{background:var(--ink);padding:2.5rem;position:relative;overflow:hidden;transition:background .35s;transform-style:preserve-3d}
+.pc.featured{background:var(--ink3);z-index:1;border:1px solid var(--cdk);margin:-1px}
+.pc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,133,74,.5),transparent);opacity:0;transition:opacity .4s}
+.pc:hover::before,.pc.featured::before{opacity:1}
+.pc-badge{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--copper);background:var(--cdk);padding:.22rem .7rem;display:inline-block;margin-bottom:1.5rem}
+.pc-name{font-family:var(--serif);font-size:1.4rem;color:var(--cream);margin-bottom:.5rem}
+.pc-price{font-family:var(--mono);font-size:2.6rem;color:var(--cream);font-weight:400;line-height:1.1;margin-bottom:.25rem}
+.pc-price span{font-size:.95rem;color:var(--cream-dim)}
+.pc-desc{font-size:.81rem;color:var(--cream-dim);margin-bottom:2rem;font-weight:300;line-height:1.65}
+.pc-list{list-style:none;display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem}
+.pc-list li{font-size:.82rem;color:var(--cream-dim);display:flex;gap:.55rem;align-items:flex-start;font-weight:300}
+.pc-list li::before{content:'→';color:var(--teal);font-family:var(--mono);flex-shrink:0;margin-top:.05em}
+
+/* TESTIMONIALS */
+.tc-sec{background:var(--ink)}
+.tc-slider{overflow:hidden;margin-top:4rem}
+.tc-track{display:flex;transition:transform .65s var(--ease)}
+.tc-card{flex:0 0 33.33%;padding:2.5rem;background:var(--ink2);border-right:1px solid var(--b);position:relative;overflow:hidden;transition:background .35s;transform-style:preserve-3d}
+.tc-card:hover{background:var(--ink3)}
+.tc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,133,74,.4),transparent);opacity:0;transition:opacity .4s}
+.tc-card:hover::before{opacity:1}
+.tc-ava{width:52px;height:52px;border-radius:50%;overflow:hidden;border:1px solid var(--bm);margin-bottom:1.5rem;filter:saturate(.4) brightness(.6);transition:filter .4s var(--ease)}
+.tc-card:hover .tc-ava{filter:saturate(.75) brightness(.8)}
+.tc-ava img{width:100%;height:100%;object-fit:cover;display:block}
+.tc-stars{color:var(--copper);font-size:.75rem;margin-bottom:1rem;letter-spacing:2px}
+.tc-q{font-family:var(--serif);font-size:1rem;color:var(--cream);line-height:1.65;margin-bottom:1.75rem;font-style:italic}
+.tc-name{font-size:.88rem;font-weight:500;color:var(--cream-dim);margin-bottom:.2rem}
+.tc-role{font-size:.75rem;color:var(--cream-faint);text-transform:uppercase;letter-spacing:.07em}
+.tc-controls{display:flex;align-items:center;gap:1.5rem;margin-top:2rem}
+.tc-btn{width:40px;height:40px;border:1px solid var(--bm);background:transparent;display:flex;align-items:center;justify-content:center;cursor:none;transition:border-color .2s,background .2s;font-size:.85rem;color:var(--cream-dim)}
+.tc-btn:hover{border-color:var(--copper);background:rgba(200,133,74,.06);color:var(--copper)}
+.tc-dots{display:flex;gap:8px;align-items:center}
+.tc-dot{width:20px;height:1px;background:var(--cream-faint);transition:width .3s,background .3s;cursor:pointer}
+.tc-dot.active{width:40px;background:var(--copper)}
+
+/* PAR 2 */
+.par2-div{position:relative;height:440px;overflow:hidden}
+.par2-img{position:absolute;inset:-20%;width:100%;height:140%;object-fit:cover;filter:saturate(.35) brightness(.28);will-change:transform}
+.par2-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(12,12,15,.65) 0%,rgba(12,12,15,.5) 50%,rgba(12,12,15,.9) 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:3rem}
+.par2-big{font-family:var(--serif);font-size:clamp(2.5rem,6vw,6rem);color:var(--cream);letter-spacing:-.04em;line-height:1;margin-bottom:.5rem}
+.par2-sub{font-size:.88rem;color:var(--cream-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:2rem}
+
+/* TRUST */
+.trust-sec{background:var(--ink2)}
+.trust-hdr{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-bottom:4rem}
+.trust-img{height:360px;overflow:hidden;border:1px solid var(--bm);position:relative}
+.trust-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.4) brightness(.45);transition:filter .6s var(--ease);display:block}
+.trust-img:hover img{filter:saturate(.6) brightness(.55)}
+.trust-img::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(12,12,15,.6) 0%,transparent 60%)}
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--b)}
+.tg{padding:2rem;background:var(--ink);transition:background .35s;display:flex;flex-direction:column;gap:.75rem}
+.tg:hover{background:var(--ink3)}
+.tg-icon{width:40px;height:40px;border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:border-color .3s,background .3s}
+.tg:hover .tg-icon{border-color:var(--cdk);background:rgba(200,133,74,.06)}
+.tg-title{font-size:.9rem;font-weight:500;color:var(--cream)}
+.tg-desc{font-size:.8rem;color:var(--cream-faint);line-height:1.65;font-weight:300}
+
+/* FAQ */
+.faq-sec{background:var(--ink)}
+.faq-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:start;margin-top:3rem}
+.faq-item{border-bottom:1px solid var(--b);overflow:hidden}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:1.4rem 0;cursor:none;font-size:.95rem;color:var(--cream);gap:1rem;transition:color .2s}
+.faq-q:hover{color:var(--clt)}
+.faq-tog{font-family:var(--mono);font-size:1rem;color:var(--copper);flex-shrink:0;transition:transform .35s var(--ease)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .45s var(--ease),padding .3s;font-size:.87rem;color:var(--cream-dim);line-height:1.82;font-weight:300}
+.faq-a.open{max-height:280px;padding-bottom:1.5rem}
+.faq-item.open .faq-tog{transform:rotate(45deg)}
+.faq-aside{position:sticky;top:8rem}
+.faq-aside-img{height:300px;overflow:hidden;border:1px solid var(--bm);position:relative;margin-bottom:2rem}
+.faq-aside-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.4) brightness(.45);display:block;transition:filter .6s var(--ease)}
+.faq-aside-img:hover img{filter:saturate(.65) brightness(.6)}
+.faq-aside-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(12,12,15,.7) 0%,transparent 50%)}
+.faq-aside-text{font-family:var(--serif);font-size:1.5rem;color:var(--cream);line-height:1.3;letter-spacing:-.02em;margin-bottom:.75rem}
+.faq-aside-sub{font-size:.82rem;color:var(--cream-dim);line-height:1.7;font-weight:300}
+
+/* CTA BAND */
+.cta-band{position:relative;overflow:hidden;padding:7rem 4rem;text-align:center}
+.cta-band-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.3) brightness(.22)}
+.cta-band-ov{position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 50% 50%,rgba(12,12,15,.72) 0%,rgba(12,12,15,.9) 100%)}
+.cta-inner{position:relative;z-index:2}
+.cta-band h2{font-family:var(--serif);font-size:clamp(2rem,4vw,3.5rem);color:var(--cream);letter-spacing:-.02em;margin-bottom:1rem}
+.cta-band p{font-size:.95rem;color:var(--cream-dim);max-width:480px;margin:0 auto 2.5rem;font-weight:300;line-height:1.75}
+.cta-acts{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+/* FOOTER */
+footer{background:var(--ink);border-top:1px solid var(--b);padding:4rem}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.foot-brand p{font-size:.83rem;color:var(--cream-faint);line-height:1.72;margin-top:1rem;font-weight:300;max-width:260px}
+.foot-logo{font-family:var(--serif);font-size:1.3rem;color:var(--cream)}
+.foot-logo span{color:var(--copper)}
+.foot-col h4{font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;color:var(--cream-dim);margin-bottom:1.25rem}
+.foot-col ul{list-style:none;display:flex;flex-direction:column;gap:.7rem}
+.foot-col a{font-size:.83rem;color:var(--cream-faint);text-decoration:none;transition:color .2s;font-weight:300}
+.foot-col a:hover{color:var(--cream)}
+.foot-bottom{border-top:1px solid var(--b);padding-top:2rem;display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--cream-faint);flex-wrap:wrap;gap:1rem}
+.foot-social{display:flex;gap:1.25rem}
+.foot-social a{font-size:.7rem;color:var(--cream-faint);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;transition:color .2s;font-family:var(--mono)}
+.foot-social a:hover{color:var(--cream)}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .features-grid,.trust-grid,.pricing-grid,.bento-grid{grid-template-columns:repeat(2,1fr)}
+  .bc.wide{grid-column:span 2}
+  .hero{grid-template-columns:1fr;padding:7rem 2rem 4rem;gap:3rem}
+  .hero-right{height:300px}
+  .trust-hdr{grid-template-columns:1fr}
+  .trust-img{display:none}
+}
+@media(max-width:900px){
+  nav{padding:1.2rem 1.5rem}
+  .nav-links{display:none}
+  .nav-links.open{display:flex;flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--ink);align-items:center;justify-content:center;gap:2rem;z-index:199}
+  .nav-links.open a{font-size:1.2rem}
+  .hbg{display:flex}
+  section{padding:4rem 1.5rem}
+  .code-wrap,.faq-wrap{grid-template-columns:1fr}
+  .step-row{grid-template-columns:60px 1fr;gap:2rem}
+  .step-img{display:none}
+  .features-grid,.trust-grid,.pricing-grid{grid-template-columns:1fr}
+  .bento-grid{grid-template-columns:1fr}
+  .bc.wide,.bc.tall{grid-column:1;grid-row:auto}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .foot-brand{grid-column:1/-1}
+  .tc-card{flex:0 0 100%}
+  .par-overlay{grid-template-columns:1fr;padding:2rem}
+}
+@media(max-width:600px){
+  .foot-grid{grid-template-columns:1fr}
+  .hero-stats{gap:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<div id="loader"><div><div class="ld-logo">Claude<span style="color:var(--copper)">.</span></div><div class="ld-bar"><div class="ld-fill"></div></div></div></div>
+<div id="cur"></div>
+<div id="cur-r"></div>
+<div id="prog"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">Claude<span>.</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#product">Product</a></li>
+    <li><a href="#developers">Developers</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#trust">Security</a></li>
+    <li><a href="#" class="nav-cta">Request Demo</a></li>
+  </ul>
+  <div class="hbg" id="hbg" onclick="toggleNav()"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-left">
+    <div class="hero-badge fu"><div class="hero-bdot"></div>API v3 Now Available — See What's New</div>
+    <h1 class="fu d1">The intelligence<br>your enterprise<br><em id="typed-word">deserves</em><span class="typing-cursor"></span></h1>
+    <p class="hero-sub fu d2">Claude is a next-generation AI assistant engineered for scale, trust, and seamless integration — purpose-built for teams that cannot afford to compromise.</p>
+    <div class="hero-actions fu d3">
+      <a href="#" class="btn-primary"><span>Request Demo →</span></a>
+      <a href="#developers" class="btn-ghost">Read the Docs</a>
+    </div>
+    <div class="hero-stats fu d4">
+      <div><div class="stat-label">Context Window</div><div class="stat-val" data-target="200" data-suffix="K">200K</div></div>
+      <div><div class="stat-label">Enterprises</div><div class="stat-val" data-target="1400" data-suffix="+">1,400+</div></div>
+      <div><div class="stat-label">Uptime SLA</div><div class="stat-val" data-target="99" data-suffix=".9%">99.9%</div></div>
+    </div>
+  </div>
+  <div class="hero-right fr d2">
+    <div class="himg himg-main">
+      <img src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?auto=format&fit=crop&w=900&q=80" alt="AI enterprise interface">
+      <div class="himg-overlay"></div>
+      <div class="himg-scan"></div>
+      <div class="himg-label">LIVE — 2.4M tokens/s</div>
+      <div class="himg-num">01 / 03</div>
+    </div>
+    <div class="himg himg-bl">
+      <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=600&q=75" alt="Code editor">
+      <div class="himg-overlay"></div>
+    </div>
+    <div class="himg himg-br">
+      <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=75" alt="Neural network">
+      <div class="himg-overlay"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGO STRIP -->
+<div class="logo-strip">
+  <div class="logo-track">
+    <span class="logo-item">Meridian Financial</span><span class="logo-item">EuroLex Compliance</span><span class="logo-item">Loom Systems</span><span class="logo-item">Vertex Capital</span><span class="logo-item">Crest Energy</span><span class="logo-item">Stratum Bank</span><span class="logo-item">Axiom Health</span><span class="logo-item">Nova Logistics</span><span class="logo-item">Apex Analytics</span><span class="logo-item">Zenith Corp</span>
+    <span class="logo-item">Meridian Financial</span><span class="logo-item">EuroLex Compliance</span><span class="logo-item">Loom Systems</span><span class="logo-item">Vertex Capital</span><span class="logo-item">Crest Energy</span><span class="logo-item">Stratum Bank</span><span class="logo-item">Axiom Health</span><span class="logo-item">Nova Logistics</span><span class="logo-item">Apex Analytics</span><span class="logo-item">Zenith Corp</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="product">
+  <div class="section-tag fu">Product</div>
+  <h2 class="section-title fu d1">Built differently,<br>by design</h2>
+  <p class="section-sub fu d2">Every capability is deliberate. Every constraint intentional. Claude is engineered to be safe at enterprise scale — not as an afterthought, but at the architectural level.</p>
+  <div class="features-grid">
+    <div class="fc fu">
+      <div class="fc-img"><img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=700&q=75" alt="Constitutional AI"><div class="fc-img-overlay"></div></div>
+      <div class="fc-body"><div class="fc-row"><div class="fc-icon">⚡</div><span class="fc-num">01</span></div><div class="fc-title">Constitutional AI</div><p class="fc-desc">A principled alignment framework that makes helpfulness, harmlessness, and honesty non-negotiable defaults — not post-hoc filters.</p></div>
+    </div>
+    <div class="fc fu d1">
+      <div class="fc-img"><img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=700&q=75" alt="Data security"><div class="fc-img-overlay"></div></div>
+      <div class="fc-body"><div class="fc-row"><div class="fc-icon">🔒</div><span class="fc-num">02</span></div><div class="fc-title">Zero-retention by default</div><p class="fc-desc">Your data never trains our models. Enterprise API traffic is isolated, ephemeral, and auditable at every layer.</p></div>
+    </div>
+    <div class="fc fu d2">
+      <div class="fc-img"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=700&q=75" alt="Analytics"><div class="fc-img-overlay"></div></div>
+      <div class="fc-body"><div class="fc-row"><div class="fc-icon">📄</div><span class="fc-num">03</span></div><div class="fc-title">200K token context</div><p class="fc-desc">Process entire codebases, legal agreements, or research corpora in a single call. No chunking, no retrieval gymnastics.</p></div>
+    </div>
+    <div class="fc fu d3">
+      <div class="fc-img"><img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=700&q=75" alt="Global network"><div class="fc-img-overlay"></div></div>
+      <div class="fc-body"><div class="fc-row"><div class="fc-icon">🔗</div><span class="fc-num">04</span></div><div class="fc-title">API-first architecture</div><p class="fc-desc">Clean REST endpoints, SDKs for Python, TypeScript, and Go. Drop into any stack in under 30 minutes.</p></div>
+    </div>
+    <div class="fc fu d4">
+      <div class="fc-img"><img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=700&q=75" alt="World connectivity"><div class="fc-img-overlay"></div></div>
+      <div class="fc-body"><div class="fc-row"><div class="fc-icon">🌐</div><span class="fc-num">05</span></div><div class="fc-title">Multilingual intelligence</div><p class="fc-desc">Native fluency across 50+ languages. Cross-lingual reasoning, not just translation — critical for global operations.</p></div>
+    </div>
+    <div class="fc fu d5">
+      <div class="fc-img"><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=700&q=75" alt="Dashboard analytics"><div class="fc-img-overlay"></div></div>
+      <div class="fc-body"><div class="fc-row"><div class="fc-icon">📊</div><span class="fc-num">06</span></div><div class="fc-title">Function calling & tools</div><p class="fc-desc">Connect Claude to your data warehouse, CRM, or internal APIs. Structured outputs and parallel tool use at scale.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PARALLAX 1 -->
+<div class="par-div" id="parDiv1">
+  <img class="par-img" id="parImg1" src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1800&q=80" alt="Enterprise workspace">
+  <div class="par-overlay">
+    <div class="par-line fu"></div>
+    <p class="par-quote fu d1">"We replaced three separate AI vendors with Claude. The 200K context window alone saved us 40% in retrieval infrastructure costs and three months of engineering time."</p>
+    <div class="par-attr fu d2"><strong>Priya Nair</strong>Head of AI Engineering, Meridian Financial</div>
+  </div>
+</div>
+
+<!-- BENTO METRICS -->
+<section class="bento-sec">
+  <div class="section-tag fu">Performance</div>
+  <h2 class="section-title fu d1">Numbers that matter<br>at enterprise scale</h2>
+  <div class="bento-grid">
+    <div class="bc tall fs">
+      <div class="bc-label">Context</div>
+      <div class="bc-title">Longest context window in production AI</div>
+      <div class="bc-big">200<em>K tokens</em></div>
+      <img class="bc-img" src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=70" alt="Circuit board">
+    </div>
+    <div class="bc fs d1">
+      <div class="bc-label">Reliability</div>
+      <div class="bc-title">API uptime SLA, globally distributed</div>
+      <div class="bc-big">99.9<em>%</em></div>
+      <div class="bc-bars" id="bentoChart">
+        <div class="bar lit"></div><div class="bar lit"></div><div class="bar lit"></div>
+        <div class="bar lit"></div><div class="bar lit"></div><div class="bar lit"></div>
+        <div class="bar lit"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </div>
+    </div>
+    <div class="bc fs d2">
+      <div class="bc-label">Enterprise reach</div>
+      <div class="bc-title">Teams deployed globally across 40+ industries</div>
+      <div class="bc-big">1,400<em>+</em></div>
+    </div>
+    <div class="bc wide fs d1">
+      <div class="bc-label">Integration</div>
+      <div class="bc-title">Works with your existing stack — no vendor lock-in, no rewrites required</div>
+      <p class="bc-desc">Drop-in SDK support, OpenAPI spec, webhooks, streaming, and batch endpoints. Connect to Snowflake, Salesforce, AWS, Azure, or any REST API your team already uses.</p>
+      <img class="bc-img" src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?auto=format&fit=crop&w=900&q=70" alt="Interface dashboard">
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="section-tag fu">Workflow</div>
+  <h2 class="section-title fu d1">From API key to<br>production in four steps</h2>
+  <div class="steps-wrap">
+    <div class="step-row fu">
+      <div class="step-n" data-n="01">01</div>
+      <div class="step-text"><h3>Authenticate</h3><p>Obtain your API key from the console. Role-based permissions, audit logging, and IP allowlisting are available from day one across all tiers.</p></div>
+      <div class="step-img"><img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=600&q=75" alt="Authentication"><div class="step-scan"></div></div>
+    </div>
+    <div class="step-row fu d1">
+      <div class="step-n" data-n="02">02</div>
+      <div class="step-text"><h3>Configure</h3><p>Set system prompts, define tool schemas, and tune temperature and token budgets. Fine-grained control over every parameter your application requires.</p></div>
+      <div class="step-img"><img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?auto=format&fit=crop&w=600&q=75" alt="Configuration"><div class="step-scan"></div></div>
+    </div>
+    <div class="step-row fu d2">
+      <div class="step-n" data-n="03">03</div>
+      <div class="step-text"><h3>Integrate</h3><p>Use the Anthropic SDK or plain HTTP. Stream responses to your frontend. Chain calls for multi-step workflows. No vendor lock-in — Claude speaks REST.</p></div>
+      <div class="step-img"><img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=75" alt="Integration"><div class="step-scan"></div></div>
+    </div>
+    <div class="step-row fu d3">
+      <div class="step-n" data-n="04">04</div>
+      <div class="step-text"><h3>Monitor</h3><p>Structured logging, token usage dashboards, and webhook callbacks. Plug into your existing observability stack — Datadog, Grafana, Honeycomb, or custom.</p></div>
+      <div class="step-img"><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=75" alt="Monitoring"><div class="step-scan"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CODE / DEVELOPERS -->
+<section class="code-sec" id="developers">
+  <div class="section-tag fu">Developers</div>
+  <div class="code-wrap">
+    <div class="code-blk fl">
+      <div class="code-hdr">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="ctabs"><div class="ctab active">Python</div><div class="ctab">TypeScript</div><div class="ctab">cURL</div></div>
+      </div>
+      <div class="code-body">
+        <pre><span class="cm"># pip install anthropic</span>
+
+<span class="kw">import</span> anthropic
+
+client <span class="op">=</span> anthropic<span class="op">.</span><span class="fn">Anthropic</span><span class="op">(</span>
+  api_key<span class="op">=</span><span class="str">"sk-ant-..."</span>
+<span class="op">)</span>
+
+message <span class="op">=</span> client<span class="op">.</span>messages<span class="op">.</span><span class="fn">create</span><span class="op">(</span>
+  model<span class="op">=</span><span class="str">"claude-opus-4-5"</span><span class="op">,</span>
+  max_tokens<span class="op">=</span><span class="num">1024</span><span class="op">,</span>
+  system<span class="op">=</span><span class="str">"You are a helpful AI."</span><span class="op">,</span>
+  messages<span class="op">=[{</span>
+    <span class="str">"role"</span><span class="op">:</span> <span class="str">"user"</span><span class="op">,</span>
+    <span class="str">"content"</span><span class="op">:</span> <span class="str">"Analyze this dataset..."</span>
+  <span class="op">}]</span>
+<span class="op">)</span>
+
+<span class="fn">print</span><span class="op">(</span>message<span class="op">.</span>content<span class="op">[</span><span class="num">0</span><span class="op">].</span>text<span class="op">)</span>
+<span class="cm"># → "The dataset shows..."</span></pre>
+      </div>
+    </div>
+    <div class="code-side fr d2">
+      <h3>Developer-first from line one</h3>
+      <p>Claude's API is designed to feel inevitable — clean, consistent, and powerful. Whether you're prototyping solo or deploying across a distributed system, the primitives stay the same.</p>
+      <p>Full SDK support. OpenAPI spec available. Webhook callbacks for async workflows. Built-in retry logic with exponential backoff. First-class streaming with SSE.</p>
+      <div class="chips">
+        <span class="chip">Python SDK</span><span class="chip">TypeScript SDK</span><span class="chip">Go SDK</span><span class="chip">REST API</span><span class="chip">Streaming SSE</span><span class="chip">Batch API</span><span class="chip">Tool Use</span><span class="chip">Vision</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-sec" id="pricing">
+  <div class="section-tag fu">Pricing</div>
+  <h2 class="section-title fu d1">Simple, transparent pricing</h2>
+  <p class="section-sub fu d2">Pay for what you use. Upgrade as you scale. No hidden fees, no commitments on the starter tier.</p>
+  <div class="pricing-grid">
+    <div class="pc fu">
+      <div class="pc-name">Starter</div>
+      <div class="pc-price">$0<span>/mo</span></div>
+      <p class="pc-desc">For developers exploring Claude's capabilities. Rate-limited access to production-grade models.</p>
+      <ul class="pc-list"><li>5,000 tokens / minute</li><li>claude-haiku access</li><li>Standard REST API</li><li>Community support</li><li>Public rate limits</li></ul>
+      <a href="#" class="btn-ghost" style="display:block;text-align:center">Get Started</a>
+    </div>
+    <div class="pc featured fu d1">
+      <div class="pc-badge">Most Popular</div>
+      <div class="pc-name">Professional</div>
+      <div class="pc-price">$150<span>/mo</span></div>
+      <p class="pc-desc">For teams building production applications with consistent volume and priority support.</p>
+      <ul class="pc-list"><li>Unlimited token budget</li><li>claude-sonnet + claude-opus</li><li>Tool use & function calling</li><li>Priority rate limits</li><li>Email support (48h SLA)</li><li>Usage dashboards</li></ul>
+      <a href="#" class="btn-primary" style="display:block;text-align:center"><span>Start Free Trial</span></a>
+    </div>
+    <div class="pc fu d2">
+      <div class="pc-name">Enterprise</div>
+      <div class="pc-price">Custom</div>
+      <p class="pc-desc">For enterprises requiring compliance, dedicated infrastructure, and contractual SLAs.</p>
+      <ul class="pc-list"><li>SOC 2 Type II + HIPAA BAA</li><li>Zero data retention guarantees</li><li>Dedicated throughput lanes</li><li>VPC / on-prem deployment</li><li>99.9% uptime SLA</li><li>Named account manager</li></ul>
+      <a href="#" class="btn-ghost" style="display:block;text-align:center">Talk to Sales →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="tc-sec">
+  <div class="section-tag fu">Trust signals</div>
+  <h2 class="section-title fu d1">What engineering teams say</h2>
+  <div class="tc-slider">
+    <div class="tc-track" id="tcTrack">
+      <div class="tc-card">
+        <div class="tc-ava"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80" alt="Priya Nair"></div>
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-q">"We replaced three separate AI vendors with Claude. The 200K context window alone saved us 40% in retrieval infrastructure costs and three months of engineering time."</p>
+        <div class="tc-name">Priya Nair</div><div class="tc-role">Head of AI Engineering, Meridian Financial</div>
+      </div>
+      <div class="tc-card">
+        <div class="tc-ava"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&h=100&q=80" alt="Thomas Berger"></div>
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-q">"The constitutional alignment isn't marketing copy. Our legal team reviewed it and approved Claude for regulated workflows within one week of evaluation. That never happens."</p>
+        <div class="tc-name">Thomas Berger</div><div class="tc-role">CTO, EuroLex Compliance GmbH</div>
+      </div>
+      <div class="tc-card">
+        <div class="tc-ava"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=100&h=100&q=80" alt="Aisha Kamara"></div>
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-q">"Five lines of Python. That's all it took to get Claude streaming into our support dashboard. No wrappers, no adapters, no surprises. Ship-ready API from day one."</p>
+        <div class="tc-name">Aisha Kamara</div><div class="tc-role">Staff Engineer, Loom Systems</div>
+      </div>
+      <div class="tc-card">
+        <div class="tc-ava"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80" alt="Marcus Chen"></div>
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-q">"We process 400-page contracts daily. Claude handles them as single-context calls with no degradation in reasoning quality. Nothing else at this scale comes close."</p>
+        <div class="tc-name">Marcus Chen</div><div class="tc-role">VP Engineering, Stratum Bank</div>
+      </div>
+      <div class="tc-card">
+        <div class="tc-ava"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=100&h=100&q=80" alt="Sofia Rodriguez"></div>
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-q">"Claude's multilingual output is genuinely fluent — not translated-sounding. We deploy it across 12 markets with a single model configuration. The savings are real."</p>
+        <div class="tc-name">Sofia Rodriguez</div><div class="tc-role">Director of Product, Nova Logistics</div>
+      </div>
+      <div class="tc-card">
+        <div class="tc-ava"><img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&h=100&q=80" alt="James Park"></div>
+        <div class="tc-stars">★★★★★</div>
+        <p class="tc-q">"The batch API alone cut our nightly analysis cost by 60%. We process 50,000 documents a night and the results land in our warehouse before 6 AM. Reliable every time."</p>
+        <div class="tc-name">James Park</div><div class="tc-role">Data Platform Lead, Apex Analytics</div>
+      </div>
+    </div>
+  </div>
+  <div class="tc-controls fu d2">
+    <button class="tc-btn" onclick="slideTC(-1)">←</button>
+    <button class="tc-btn" onclick="slideTC(1)">→</button>
+    <div class="tc-dots" id="tcDots"></div>
+  </div>
+</section>
+
+<!-- PARALLAX 2 -->
+<div class="par2-div" id="parDiv2">
+  <img class="par2-img" id="parImg2" src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1800&q=80" alt="AI abstraction">
+  <div class="par2-overlay">
+    <div class="par2-big fu">200K</div>
+    <div class="par2-sub fu d1">Tokens of unbroken context — process an entire codebase in one call</div>
+    <a href="#developers" class="btn-primary fu d2"><span>See API Docs →</span></a>
+  </div>
+</div>
+
+<!-- TRUST & SECURITY -->
+<section class="trust-sec" id="trust">
+  <div class="trust-hdr">
+    <div>
+      <div class="section-tag fu">Security & Compliance</div>
+      <h2 class="section-title fu d1">Enterprise-grade trust isn't optional</h2>
+      <p class="section-sub fu d2">Security is architectural, not cosmetic. Every layer of Claude's infrastructure is designed for the most demanding compliance environments in healthcare, finance, and government.</p>
+      <div style="margin-top:2rem" class="fu d3"><a href="#" class="btn-ghost">Download Security Brief →</a></div>
+    </div>
+    <div class="trust-img fr d1">
+      <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=800&q=80" alt="Security infrastructure">
+    </div>
+  </div>
+  <div class="trust-grid">
+    <div class="tg fu"><div class="tg-icon">🛡️</div><div class="tg-title">SOC 2 Type II</div><p class="tg-desc">Independently audited security controls, available for review under NDA. Annual re-audit as standard.</p></div>
+    <div class="tg fu d1"><div class="tg-icon">🏥</div><div class="tg-title">HIPAA Ready</div><p class="tg-desc">Business Associate Agreement available on Enterprise tier. Designed for healthcare and regulated industries.</p></div>
+    <div class="tg fu d2"><div class="tg-icon">🔐</div><div class="tg-title">Zero Retention</div><p class="tg-desc">API traffic is never stored or used for model training. Contractually guaranteed with cryptographic logging.</p></div>
+    <div class="tg fu d3"><div class="tg-icon">🌍</div><div class="tg-title">GDPR Compliant</div><p class="tg-desc">EU data residency options. DPA provided as standard. Built for international regulatory frameworks.</p></div>
+    <div class="tg fu d4"><div class="tg-icon">🔍</div><div class="tg-title">Audit Logging</div><p class="tg-desc">Every API call is logged with immutable timestamps. Export to your SIEM in real time via Kafka or webhook.</p></div>
+    <div class="tg fu d5"><div class="tg-icon">📋</div><div class="tg-title">Constitutional AI</div><p class="tg-desc">Alignment framework that makes safety a property of the model, not a filter placed on top of it.</p></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-sec">
+  <div class="section-tag fu">FAQ</div>
+  <div class="faq-wrap">
+    <div>
+      <h2 class="section-title fu d1" style="margin-bottom:2.5rem">Common questions</h2>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)">Does Anthropic use my API data for training?<span class="faq-tog">+</span></div><div class="faq-a">No. Enterprise API traffic is never used to train or fine-tune Claude models. This commitment is contractually guaranteed in the Enterprise tier and documented in our data processing addendum (DPA).</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)">How does Claude compare to GPT-4 or Gemini?<span class="faq-tog">+</span></div><div class="faq-a">Claude leads on context length (200K tokens), long-document reasoning, and constitutional alignment. The right choice depends on your workload — we encourage benchmarking on your production tasks before committing.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)">Can I deploy Claude in my own VPC or on-prem?<span class="faq-tog">+</span></div><div class="faq-a">Yes. Enterprise customers can deploy Claude in dedicated cloud environments or on-premises via our AWS and GCP Marketplace listings and private deployment programs. Contact sales for architecture details.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)">What are the rate limits on Professional?<span class="faq-tog">+</span></div><div class="faq-a">Professional tier includes priority rate limits — typically 10× higher than Starter, with burst capacity. Exact limits depend on model selection. Custom throughput lanes are available on Enterprise.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)">How do I migrate from another LLM provider?<span class="faq-tog">+</span></div><div class="faq-a">Claude's API structure is similar to OpenAI's, making migration straightforward for most teams. We provide a migration guide, a compatibility layer, and dedicated onboarding support on Professional and Enterprise tiers.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)">Is EU data residency available?<span class="faq-tog">+</span></div><div class="faq-a">Yes. EU data residency is available on the Enterprise tier with processing in AWS eu-west-1 (Ireland) or eu-central-1 (Frankfurt). A GDPR-compliant DPA is provided as standard.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)">Can I fine-tune Claude on proprietary data?<span class="faq-tog">+</span></div><div class="faq-a">Fine-tuning is available in private beta for qualified Enterprise customers. System prompts, few-shot examples, and RAG address most customization needs effectively without training overhead.</div></div>
+    </div>
+    <div class="faq-aside fr d3">
+      <div class="faq-aside-img">
+        <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&q=80" alt="Enterprise team">
+      </div>
+      <div class="faq-aside-text">Still have questions about enterprise deployment?</div>
+      <p class="faq-aside-sub">Our solutions team walks you through architecture, compliance requirements, and migration paths. No sales pressure — just answers.</p>
+      <div style="margin-top:1.5rem"><a href="#" class="btn-ghost">Talk to a Solutions Architect →</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <img class="cta-band-bg" src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=1800&q=80" alt="">
+  <div class="cta-band-ov"></div>
+  <div class="cta-inner">
+    <h2 class="fu">Ready to build with Claude?</h2>
+    <p class="fu d1">Join over 1,400 enterprise teams using Claude as their AI foundation. Start with a free API key or schedule a demo with our solutions team.</p>
+    <div class="cta-acts fu d2">
+      <a href="#" class="btn-primary"><span>Get API Access →</span></a>
+      <a href="#" class="btn-ghost">Talk to Sales</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <div class="foot-logo">Claude<span>.</span></div>
+      <p>A next-generation AI assistant built by Anthropic. Designed for trust, performance, and enterprise-grade scale.</p>
+    </div>
+    <div class="foot-col"><h4>Product</h4><ul><li><a href="#">Features</a></li><li><a href="#">Pricing</a></li><li><a href="#">Changelog</a></li><li><a href="#">Status</a></li></ul></div>
+    <div class="foot-col"><h4>Developers</h4><ul><li><a href="#">Documentation</a></li><li><a href="#">API Reference</a></li><li><a href="#">SDKs & Libraries</a></li><li><a href="#">Cookbook</a></li></ul></div>
+    <div class="foot-col"><h4>Company</h4><ul><li><a href="#">About Anthropic</a></li><li><a href="#">Security</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li></ul></div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Anthropic, PBC. All rights reserved.</span>
+    <div class="foot-social"><a href="#">Twitter</a><a href="#">GitHub</a><a href="#">LinkedIn</a><a href="#">Discord</a></div>
+    <span style="font-family:var(--mono);font-size:.7rem">claude-opus-4-6 · claude-sonnet-4-6 · claude-haiku-4-5</span>
+  </div>
+</footer>
+
+<script>
+/* LOADER */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('done');
+    document.querySelectorAll('.hero-left .fu,.hero-left .fl,.hero-left .fr,.hero-right').forEach(el => setTimeout(() => el.classList.add('v'), 50));
+    startTyping();
+  }, 1100);
+});
+
+/* CURSOR */
+const cur = document.getElementById('cur'), curR = document.getElementById('cur-r');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; });
+(function animR() { rx += (mx - rx) * .12; ry += (my - ry) * .12; curR.style.left = rx + 'px'; curR.style.top = ry + 'px'; requestAnimationFrame(animR); })();
+
+/* SCROLL */
+window.addEventListener('scroll', () => {
+  const pct = (scrollY / (document.documentElement.scrollHeight - innerHeight)) * 100;
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('nav').classList.toggle('scrolled', scrollY > 60);
+  doParallax();
+});
+
+/* NAV */
+function toggleNav() {
+  const l = document.getElementById('navLinks'), h = document.getElementById('hbg');
+  l.classList.toggle('open'); h.classList.toggle('open');
+}
+
+/* INTERSECTION */
+const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } }), { threshold: .1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fu,.fl,.fr,.fs').forEach(el => { if (!el.closest('.hero-left') && !el.classList.contains('hero-right')) obs.observe(el); });
+
+/* TYPING */
+const words = ['deserves','demands','trusts','requires','earns'];
+let wi = 0, ci = 0, del = false;
+function startTyping() {
+  const el = document.getElementById('typed-word');
+  if (!el) return;
+  (function tick() {
+    const w = words[wi];
+    if (!del) { el.textContent = w.slice(0, ++ci); if (ci === w.length) { del = true; setTimeout(tick, 2200); return; } }
+    else { el.textContent = w.slice(0, --ci); if (ci === 0) { del = false; wi = (wi+1) % words.length; setTimeout(tick, 300); return; } }
+    setTimeout(tick, del ? 60 : 90);
+  })();
+}
+
+/* PARALLAX */
+function doParallax() {
+  ['parDiv1','parDiv2'].forEach((id, i) => {
+    const d = document.getElementById(id);
+    const img = document.getElementById(i === 0 ? 'parImg1' : 'parImg2');
+    if (!d || !img) return;
+    const r = d.getBoundingClientRect();
+    if (r.bottom > 0 && r.top < innerHeight) {
+      const pct = (scrollY - (d.offsetTop - innerHeight)) / (innerHeight + d.offsetHeight);
+      img.style.transform = `translateY(${pct * 90}px)`;
+    }
+  });
+}
+
+/* BENTO BARS */
+const barH = ['70%','85%','60%','90%','75%','95%','88%','40%','55%','30%'];
+new IntersectionObserver(entries => entries.forEach(e => {
+  if (!e.isIntersecting) return;
+  e.target.querySelectorAll('.bar').forEach((b, i) => { b.style.height = '0%'; setTimeout(() => b.style.height = barH[i] || '50%', i * 80 + 300); });
+  e.target.closest ? null : null;
+}), { threshold: .3 }).observe(document.getElementById('bentoChart').closest('.bc'));
+
+/* 3D TILT */
+document.querySelectorAll('.fc,.pc,.bc,.tg,.tc-card').forEach(c => {
+  c.addEventListener('mousemove', e => {
+    const r = c.getBoundingClientRect(), x = (e.clientX-r.left)/r.width-.5, y = (e.clientY-r.top)/r.height-.5;
+    c.style.transform = `perspective(900px) rotateY(${x*5}deg) rotateX(${-y*5}deg) translateZ(3px)`;
+    c.style.transition = 'transform .05s,background .4s';
+  });
+  c.addEventListener('mouseleave', () => { c.style.transform = ''; c.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1),background .4s'; });
+});
+
+/* MAGNETIC BUTTONS */
+document.querySelectorAll('.btn-primary,.btn-ghost').forEach(b => {
+  b.addEventListener('mousemove', e => {
+    const r = b.getBoundingClientRect(), x = (e.clientX-r.left-r.width/2)*.25, y = (e.clientY-r.top-r.height/2)*.25;
+    b.style.transform = `translate(${x}px,${y}px) translateY(-2px)`; b.style.transition = 'transform .08s';
+  });
+  b.addEventListener('mouseleave', () => { b.style.transform = ''; b.style.transition = 'transform .4s cubic-bezier(.16,1,.3,1)'; });
+});
+
+/* TESTIMONIAL CAROUSEL */
+let tcIdx = 0;
+const track = document.getElementById('tcTrack');
+const cards = track ? Array.from(track.children) : [];
+const vc = () => window.innerWidth < 900 ? 1 : 3;
+function buildDots() {
+  const el = document.getElementById('tcDots'); if (!el) return;
+  el.innerHTML = ''; const pages = Math.ceil(cards.length / vc());
+  for (let i = 0; i < pages; i++) { const d = document.createElement('div'); d.className = 'tc-dot'+(i===0?' active':''); d.onclick = () => goTC(i*vc()); el.appendChild(d); }
+}
+function goTC(idx) {
+  const v = vc(), max = Math.max(0, cards.length - v);
+  tcIdx = Math.max(0, Math.min(idx, max));
+  const w = cards[0] ? cards[0].getBoundingClientRect().width : 0;
+  track.style.transform = `translateX(-${tcIdx * w}px)`;
+  document.querySelectorAll('.tc-dot').forEach((d,i) => d.classList.toggle('active', i === Math.floor(tcIdx/v)));
+}
+function slideTC(dir) { goTC(tcIdx + dir * vc()); }
+buildDots(); window.addEventListener('resize', buildDots);
+
+/* FAQ */
+function tFaq(el) {
+  const item = el.parentElement, a = item.querySelector('.faq-a'), open = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-a').classList.remove('open'); });
+  if (!open) { item.classList.add('open'); a.classList.add('open'); }
+}
+
+/* CODE TABS */
+document.querySelectorAll('.ctab').forEach(t => t.addEventListener('click', () => { t.parentElement.querySelectorAll('.ctab').forEach(x => x.classList.remove('active')); t.classList.add('active'); }));
+
+/* HERO CANVAS */
+const canvas = document.getElementById('hero-canvas'), ctx = canvas.getContext('2d');
+let W, H, pts = [];
+function rsz() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+rsz(); window.addEventListener('resize', rsz);
+class P { constructor(){this.r()} r(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.35;this.vy=(Math.random()-.5)*.35;this.rad=Math.random()*1.4+.3;this.a=Math.random()*.45+.05;this.col=Math.random()>.55?'#C8854A':'#3DBFA0'} tick(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.r()} draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.rad,0,Math.PI*2);ctx.fillStyle=this.col;ctx.globalAlpha=this.a;ctx.fill()} }
+for(let i=0;i<130;i++) pts.push(new P());
+(function ap(){ctx.clearRect(0,0,W,H);ctx.globalAlpha=1;for(let i=0;i<pts.length;i++){for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<110){ctx.beginPath();ctx.strokeStyle=`rgba(200,133,74,${.07*(1-d/110)})`;ctx.lineWidth=.5;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}}}pts.forEach(p=>{p.tick();p.draw()});requestAnimationFrame(ap)})();
+</script>
+</body>
+</html>
